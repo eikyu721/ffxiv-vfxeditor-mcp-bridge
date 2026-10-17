@@ -89,66 +89,20 @@ namespace VfxEditor {
         public static PbdManagerGroup PbdManager { get; private set; }
 
         public static string RootLocation { get; private set; }
-#if BETA
-        private const string CommandName = "/vfxbeta";
-#else
-        private const string CommandName = "/vfxedit";
-#endif
+        private const string CommandName = "/vfxmcpbridge";
 
         private static bool ClearKeyState = false;
         public static bool IsImguiSafe { get; set; } = false;
 
-        private static ConfigurationWindow ConfigWindow;
+        private static ConfigurationWindow ConfigWindow = null!;
+        private readonly AnimationMcpBridge McpBridge;
 
         public Plugin( IDalamudPluginInterface pluginInterface ) {
             pluginInterface.Create<Dalamud>();
 
-            Dalamud.CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) { HelpMessage = "toggle ui" } );
-
             RootLocation = Dalamud.PluginInterface.AssemblyLocation.DirectoryName;
-            OtterTex.NativeDll.Initialize( pluginInterface.AssemblyLocation.DirectoryName );
-
-            WindowSystem = new();
-
-            Configuration = Dalamud.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Setup();
-            ConfigWindow = new( Configuration );
-
-            TextureManager.LoadLibrary();
-            TextureManager = new();
-            TmbManager = new();
-            AvfxManager = new();
-            PapManager = new();
-            ScdManager = new();
-            EidManager = new();
-            UldManager = new();
-            PhybManager = new();
-            SklbManager = new();
-            AtchManager = new();
-            SkpManager = new();
-            ShpkManager = new();
-            ShcdManager = new();
-            MtrlManager = new();
-            MdlManager = new();
-            KdbManager = new();
-            PbdManager = new();
-            AddDefaultDocuments();
-
-            ToolsDialog = new();
-            PenumbraIpc = new();
-            PenumbraExportDialog = new();
-            TexToolsExportDialog = new();
-            ResourceLoader = new();
-            DirectXManager = new();
-            TrackerManager = new();
-            LibraryManager = new();
-            PenumbraImportDialog = new();
-
-            Dalamud.Framework.Update += FrameworkOnUpdate;
-            Dalamud.PluginInterface.UiBuilder.Draw += Draw;
-            Dalamud.PluginInterface.UiBuilder.Draw += FileBrowserManager.Draw;
-            Dalamud.PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUi;
-            Dalamud.PluginInterface.UiBuilder.OpenMainUi += OpenConfigUi;
+            Dalamud.CommandManager.AddHandler( CommandName, new CommandInfo( OnCommand ) { HelpMessage = "show MCP animation bridge status" } );
+            McpBridge = new AnimationMcpBridge();
         }
 
         public static void CheckClearKeyState() {
@@ -162,40 +116,15 @@ namespace VfxEditor {
             ClearKeyState = false;
         }
 
-        private void OpenConfigUi() => AvfxManager.Show();
+        private void OpenConfigUi() { }
 
         private void OnCommand( string command, string rawArgs ) {
-            if( string.IsNullOrEmpty( rawArgs ) ) {
-                AvfxManager?.Show();
-                return;
-            }
-            if( Groups.FindFirst( x => rawArgs.ToLower().Equals( x.GetId().ToLower() ), out var manager ) ) manager.Show();
+            Dalamud.InfoNotification( $"Listening on 127.0.0.1:{AnimationMcpBridge.Port}. Export root: {McpBridge.ExportRoot}", "VFXEditor MCP Bridge" );
         }
 
         public void Dispose() {
-            Dalamud.Framework.Update -= FrameworkOnUpdate;
-            Dalamud.PluginInterface.UiBuilder.Draw -= FileBrowserManager.Draw;
-            Dalamud.PluginInterface.UiBuilder.Draw -= Draw;
-            Dalamud.PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUi;
-            Dalamud.PluginInterface.UiBuilder.OpenMainUi -= OpenConfigUi;
-
             Dalamud.CommandManager.RemoveHandler( CommandName );
-            PenumbraIpc?.Dispose();
-
-            ResourceLoader?.Dispose();
-            ResourceLoader = null;
-
-            TextureManager.FreeLibrary();
-            Groups.ForEach( x => x?.Reset( true ) );
-            DirectXManager?.Dispose();
-
-            WindowSystem.RemoveAllWindows();
-            Modals.Clear();
-
-            VfxSpawn.Dispose();
-            TmbSpawn.Dispose();
-            FileBrowserManager.Dispose();
-            ExportDialog.Reset();
+            McpBridge.Dispose();
         }
     }
 }

@@ -13,6 +13,8 @@ namespace VfxEditor.PapFormat.Motion {
         public readonly string SklbTempPath;
         private readonly List<PapMotion> Motions = [];
 
+        public IReadOnlyList<PapMotion> ReadOnlyMotions => Motions;
+
         public HavokData Bones;
         public hkaSkeleton* Skeleton =>
             Bones?.AnimationContainer != null && Bones.AnimationContainer->Skeletons.Length > 0
@@ -83,6 +85,10 @@ namespace VfxEditor.PapFormat.Motion {
 
             return string.Format( format, modelId, 1 ); // TODO: is this always 1?
         }
+
+        public string GetDefaultSkeletonPath() => GetSklbPath();
+
+        public void InitializeSkeleton( SimpleSklb skeleton ) => UpdateSkeleton( skeleton );
 
         public void Draw( int havokIndex ) {
             if( File.IsMaterial ) {

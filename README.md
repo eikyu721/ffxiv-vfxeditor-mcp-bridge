@@ -1,61 +1,41 @@
-# VFXEditor [![Download count](https://img.shields.io/endpoint?url=https%3A%2F%2Fvz32sgcoal.execute-api.us-east-1.amazonaws.com%2FVFXEditor)](https://github.com/0ceal0t/Dalamud-VFXEditor)
+# VFXEditor MCP Bridge
 
-**[Wiki](https://xiv.dev/game-data/visual-effects)** | **[Guides](https://github.com/0ceal0t/Dalamud-VFXEditor/wiki)** | Icon by [PAPACHIN](https://www.xivmodarchive.com/user/192152)
+A safety-scoped MCP bridge derived from [0ceal0t/Dalamud-VFXEditor](https://github.com/0ceal0t/Dalamud-VFXEditor). It adds headless PAP inspection/export, local SKLB/PHYB inspection, and narrowly owned GPose actor-animation control without replacing game resources.
 
-_VFX, animation, sound, and physics editing plugin for Dalamud_
+This is an independent fork with its own assembly, Dalamud identity, command, and loopback endpoint. It can coexist with the upstream VFXEditor plugin.
 
-![](https://github.com/0ceal0t/Dalamud-VFXEditor/assets/18051158/83273164-d216-4758-9249-a2f38c03d6c2)
+## What it provides
 
-> Just want to hide certain VFXs? Use [EasyEyes](https://github.com/0ceal0t/EasyEyes) instead
+- Search and inspect PAP animations and export them as glTF.
+- Inspect local SKLB skeletons and export them as glTF/GLB.
+- Write a separately named SKLB with explicit, hash-guarded local bone-translation edits.
+- Inspect supported PHYB chain, node, gravity, wind, damping, and collision fields.
+- Play a real ActionTimeline on the current GPose target.
+- Freeze a zero-based frame only when Brio confirms ownership of the target actor.
+- Query, resume, and reset bridge-owned animation state.
+- Read a deliberately restricted set of sleeve bones from the current GPose target.
 
-### Supported File Types
+The bridge does **not** replace game resources, change Penumbra mappings or collections, redraw actors, or expose unrestricted native skeleton traversal. The experimental glove-binding reader is disabled because an earlier implementation caused a confirmed access violation on the CN client.
 
-| Extension | Description |
-| --- | --- |
-| `.avfx` | VFXs, such as particles and glow effects. Has no impact on a character's motion |
-| `.pap` | The animations performed by a character (such as swinging a weapon, smiling, etc.) |
-| `.tmb` | Timelines for when to trigger VFXs, animations, and sound effects. Edit this if you want to replace a skill in its entirety |
-| `.scd` | Sound files (background music, sound effects) |
-| `.eid` | Bind points used to attach VFXs to character models |
-| `.uld` | Determines the layout of UI elements |
-| `.atex` | Texture files for `.avfx` |
-| `.tex` | Texture files for UI elements and game models |
-| `.atch` | Attachment points for weapons and other accessories (like the Machinist bag and Astrologian deck) |
-| `.sklb` | Skeleton and bone definitions |
-| `.skp` | Skeleton paramters, such as IK |
-| `.shpk` | Bundled packages of vertex and pixel shaders |
-| `.shcd` | Individual shaders |
-| `.mtrl` | Materials for models |
-| `.mdl` | Meshes |
+See [MCP_README.md](MCP_README.md) for the full tool list, build instructions, safety model, ownership rules, and known limitations.
 
-## Installation
-1. This plugin requires [XIV Quick Launcher](https://github.com/goatcorp/FFXIVQuickLauncher) to run
-2. Install the plugin from the `/xlplugins` menu
-3. Once installed, open with `/vfxedit`
+## Build
 
-### Beta Builds
-Add the following custom repository in `/xlsettings > Experimental`:
-```
-https://raw.githubusercontent.com/0ceal0t/Dalamud-VFXEditor/main/repo.json
+Requirements: Dalamud API 15 development assemblies, .NET 10 SDK, Python 3.11, and [uv](https://docs.astral.sh/uv/).
+
+```powershell
+git clone --recurse-submodules <repository-url>
+cd ffxiv-vfxeditor-mcp-bridge
+dotnet build VFXEditor/VFXEditor.csproj -c Debug -p:DalamudLibPath="C:\path\to\Dalamud\dev"
+cd mcp
+uv sync
+uv run python -m unittest discover -v
 ```
 
-The beta and main builds cannot both be enabled at the same time, so make sure to disable one before enabling the other. Open the beta version using `/vfxbeta`
+Load `VFXEditor/bin/Debug/VFXEditorMcpBridge.dll` as a Dalamud development plugin. `/vfxmcpbridge` reports the local endpoint and export directory.
 
-## Usage
-1. Select a _"Loaded Vfx"_ (the new effect you want to use)
-2. Select a _"Vfx Being Replaced"_ (the effect which is being overriden. This can be the same as the source)
-3. Make any modifications you want, then press `UPDATE`
+## Upstream and license
 
-## Support
-Having problems? Check [troubleshooting tips](https://github.com/0ceal0t/Dalamud-VFXEditor/wiki/Troubleshooting) or a [basic guide](https://github.com/0ceal0t/Dalamud-VFXEditor/wiki/Basic-Guide). If you have other questions, please open an [Issue](https://github.com/0ceal0t/Dalamud-VFXEditor/issues)
+This project retains the upstream commit history and MIT license. Original VFXEditor copyright and attribution remain in [LICENSE](LICENSE). The MCP-specific changes are maintained as a fork and are not affiliated with Square Enix, Dalamud, Brio, or the upstream VFXEditor author.
 
-- [QuickLauncher Discord](https://github.com/goatcorp/FFXIVQuickLauncher#need-any-help)
-- [Students of Baldesion](https://discord.gg/TrCeuZQgbg)
-
-## Contributing
-If a VFX is behaving unexpectedly, or you are getting log messages indicating that it is not being parsed properly, please open an [Issue](https://github.com/0ceal0t/Dalamud-VFXEditor/issues).
-
-- [.phyb research document](https://docs.google.com/document/d/1g0iSnvz9IjkGBVqXM5h3KfoyP_LOsr9LGKqiVhMZ_Us/edit)
-- [.tmb/.pap research document](https://docs.google.com/document/d/1LhsTHO65pu7NcerhvoQBrYtgKyjSPggjx0JurwZVpw4/edit)
-- [.scd research document](https://docs.google.com/document/d/1L9GKap9u703QJH9u1ymXCUEx4BMi1Tov4J5tvFRWp-w/edit)
-- [.sklb research document](https://docs.google.com/document/d/13TBozIOwKHCMm1SMIhVUQtzaCg9bU18gDATHmXtqO1U/edit#heading=h.4fswckssvps1)
+FFXIV and related marks belong to their respective owners. Use development plugins and game-memory tooling at your own risk.

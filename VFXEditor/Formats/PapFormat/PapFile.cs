@@ -21,8 +21,8 @@ namespace VfxEditor.PapFormat {
     }
 
     public class PapFile : FileManagerFile {
-        public readonly GradientInstance GradientInstance = new();
-        public readonly ModelInstance BoneInstance = new();
+        public readonly GradientInstance GradientInstance;
+        public readonly ModelInstance BoneInstance;
 
         public readonly string HkxTempLocation;
         public readonly string SourcePath;
@@ -44,7 +44,11 @@ namespace VfxEditor.PapFormat {
 
         public readonly HashSet<nint> Handles = [];
 
-        public PapFile( BinaryReader reader, string sourcePath, string hkxTemp, bool init, bool verify ) : base() {
+        public PapFile( BinaryReader reader, string sourcePath, string hkxTemp, bool init, bool verify, bool headless = false ) : base() {
+            if( !headless ) {
+                GradientInstance = new();
+                BoneInstance = new();
+            }
             SourcePath = sourcePath;
             HkxTempLocation = hkxTemp;
             AnimationsDropdown = new( this, Animations );
@@ -205,8 +209,8 @@ namespace VfxEditor.PapFormat {
             foreach( var item in Handles ) Marshal.FreeHGlobal( item );
             Handles.Clear();
 
-            GradientInstance.Dispose();
-            BoneInstance.Dispose();
+            GradientInstance?.Dispose();
+            BoneInstance?.Dispose();
         }
     }
 }

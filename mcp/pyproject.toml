@@ -1,0 +1,8 @@
+[project]
+name = "ffxiv-vfxeditor-animation-mcp"
+version = "0.3.0"
+requires-python = ">=3.11,<3.12"
+dependencies = ["mcp[cli]>=2.0,<3"]
+
+[tool.uv]
+package = false

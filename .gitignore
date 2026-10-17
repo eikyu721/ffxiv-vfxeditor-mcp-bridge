@@ -10,3 +10,9 @@ scripts/delta.txt
 scripts/npc_files.json
 flatc.exe
 scripts/common_*
+staging/
+mcp/.venv/
+mcp/.uv-cache/
+**/__pycache__/
+*.py[cod]
+.idea/

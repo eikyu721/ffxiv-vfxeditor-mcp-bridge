@@ -1,11 +1,12 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
     <PropertyGroup>
-        <AssemblyTitle>VFXEditor</AssemblyTitle>
+        <AssemblyTitle>VFXEditor MCP Bridge</AssemblyTitle>
         <Company></Company>
-        <Product>VFXEditor</Product>
+        <Product>VFXEditor MCP Bridge</Product>
         <Copyright>Copyright © 2020</Copyright>
-        <FileVersion>1.9.4.4</FileVersion>
-        <AssemblyVersion>1.9.4.4</AssemblyVersion>
+        <FileVersion>0.3.5.0</FileVersion>
+        <AssemblyVersion>0.3.5.0</AssemblyVersion>
+        <AssemblyName>VFXEditorMcpBridge</AssemblyName>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -18,8 +19,13 @@
         <NoWarn>CS8625; CS8603; CS8601; CS8604; CS8629; CS8618; CS8602; CS8600; CS8619</NoWarn>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))'">
+        <DalamudLibPath Condition="'$(DalamudLibPath)' == '' and '$(DALAMUD_HOME)' != ''">$(DALAMUD_HOME)</DalamudLibPath>
+        <DalamudLibPath Condition="'$(DalamudLibPath)' == ''">$(APPDATA)\XIVLauncherCN\addon\Hooks\dev\</DalamudLibPath>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
-        <DalamudLibPath>$(HOME)\.xlcore\dalamud\Hooks\dev\</DalamudLibPath>
+        <DalamudLibPath Condition="'$(DalamudLibPath)' == ''">$(HOME)\.xlcore\dalamud\Hooks\dev\</DalamudLibPath>
         <RootNamespace>VfxEditor</RootNamespace>
     </PropertyGroup>
 
@@ -191,6 +197,7 @@
         </Content>
         <Content Include="VFXEditor.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>VFXEditorMcpBridge.json</TargetPath>
         </Content>
         <Content Include="Files\VGAudioCli.exe">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

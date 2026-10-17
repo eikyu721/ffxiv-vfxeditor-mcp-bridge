@@ -1,12 +1,12 @@
 {
-    "Author": "ocealot",
-    "Name": "VFXEditor",
-    "Punchline": "VFX editor and viewer",
-    "Description": "VFX, animation, and sound editing plugin. Icon by PAPACHIN",
-    "InternalName": "VFXEditor",
-    "AssemblyVersion": "1.9.4.4",
-    "RepoUrl": "https://github.com/0ceal0t/Dalamud-VFXEditor",
+    "Author": "ocealot; MCP bridge fork for Eikyu",
+    "Name": "VFXEditor MCP Bridge",
+    "Punchline": "PAP export, scoped animation control, and read-only sleeve skeleton inspection",
+    "Description": "Headless PAP inspection/export, narrow live sleeve-skeleton readback, and scoped actor ActionTimeline control bridge derived from VFXEditor. Does not replace game resources.",
+    "InternalName": "VFXEditorMcpBridge",
+    "AssemblyVersion": "0.3.5.0",
+    "RepoUrl": "https://github.com/eikyu721/ffxiv-vfxeditor-mcp-bridge",
     "ApplicableVersion": "any",
-    "Tags": [ "VFX", "AVFX" ],
-    "LoadPriority": 69
+    "Tags": [ "Animation", "MCP" ],
+    "LoadPriority": 68
 }
